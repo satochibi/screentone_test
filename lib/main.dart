@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
-import 'package:flutter/services.dart';
-import 'dart:async';
-
 void main() {
   runApp(const MyApp());
 }
@@ -40,12 +37,36 @@ class MyApp extends StatelessWidget {
 }
 
 Future<ui.Image> getPattern() async {
-  final ByteData data = await rootBundle.load("img/screentone.png");
-  final Completer<ui.Image> completer = Completer();
-  ui.decodeImageFromList(Uint8List.view(data.buffer), (ui.Image img) {
-    return completer.complete(img);
-  });
-  return completer.future;
+  var pictureRecorder = ui.PictureRecorder();
+  Canvas patternCanvas = Canvas(pictureRecorder);
+
+  const colorList = [
+    Colors.black,
+    Color(0xffff7f7f),
+    Color(0xffff7fff),
+    Color(0xff7f7fff),
+    Color(0xff7fbfff),
+    Color(0xff7fffff),
+    Color(0xff7fff7f),
+    Color(0xffffff7f),
+    Color(0xffffbf7f)
+  ];
+
+  final paintList = colorList
+      .map((e) => Paint()
+        ..color = e
+        ..strokeWidth = 1
+        ..style = PaintingStyle.stroke
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = false)
+      .toList();
+
+  paintList.asMap().forEach((index, element) => patternCanvas.drawPoints(
+      ui.PointMode.points, [Offset(index % 3, index / 3)], paintList[index]));
+
+  final aPatternPicture = pictureRecorder.endRecording();
+
+  return aPatternPicture.toImage(3, 3);
 }
 
 class _SamplePainter extends CustomPainter {

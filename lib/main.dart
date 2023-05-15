@@ -123,12 +123,27 @@ Future<ui.Image> getPattern() async {
     ..strokeJoin = StrokeJoin.round
     ..isAntiAlias = false;
 
-  patternCanvas.drawPoints(ui.PointMode.points,
-      [const Offset(0, 0), const Offset(1, 1), const Offset(2, 0)], paint);
+  patternCanvas.drawPoints(
+      ui.PointMode.points,
+      [
+        Offset(2, 0),
+        Offset(1, 1),
+        Offset(3, 1),
+        Offset(0, 2),
+        Offset(1, 3),
+        Offset(3, 3),
+        Offset(2 + 4, 0),
+        Offset(1 + 4, 1),
+        Offset(3 + 4, 1),
+        Offset(0 + 4, 2),
+        Offset(1 + 4, 3),
+        Offset(3 + 4, 3)
+      ],
+      paint);
 
   final aPatternPicture = pictureRecorder.endRecording();
 
-  return aPatternPicture.toImage(2, 2);
+  return aPatternPicture.toImage(4, 4);
 }
 
 class StrokesModel {

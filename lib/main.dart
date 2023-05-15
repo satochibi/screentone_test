@@ -18,11 +18,17 @@ class DrawingPage extends StatefulWidget {
   const DrawingPage({super.key});
 
   @override
-  _DrawingPageState createState() => _DrawingPageState();
+  DrawingPageState createState() => DrawingPageState();
 }
 
-class _DrawingPageState extends State<DrawingPage> {
+class DrawingPageState extends State<DrawingPage> {
   StrokesModel strokes = StrokesModel();
+  final repaint = ValueNotifier<int>(0);
+
+  void refresh(ValueNotifier<int> repaint) {
+    repaint.value++;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +45,14 @@ class _DrawingPageState extends State<DrawingPage> {
             child: GestureDetector(
               onPanDown: (details) {
                 strokes.onPress(details.localPosition);
-                setState(() {});
+                refresh(repaint);
               },
               onPanUpdate: (details) {
                 strokes.drawing(details.localPosition);
-                setState(() {});
+                refresh(repaint);
               },
               onPanEnd: (details) {
-                setState(() {});
+                refresh(repaint);
               },
               child: CustomPaint(
                 painter: _DrawingPainter(strokes),
@@ -67,17 +73,6 @@ class _DrawingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (strokes.all.isEmpty) return;
-    var path = Path();
-
-    strokes.all.forEach((Stroke stroke) {
-      stroke._points.asMap().forEach((int index, Offset anOffset) {
-        if (index == 0) {
-          path.moveTo(anOffset.dx, anOffset.dy);
-        } else {
-          path.lineTo(anOffset.dx, anOffset.dy);
-        }
-      });
-    });
 
     Paint paint = Paint()
       ..color = Colors.black
@@ -86,17 +81,27 @@ class _DrawingPainter extends CustomPainter {
       ..isAntiAlias = false
       ..strokeWidth = 4.0;
 
-/*
-    if (strokes.screentoneImage != null) {
-      paint = Paint()
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 4.0
-        ..isAntiAlias = false
-        ..shader = ImageShader(strokes.screentoneImage as ui.Image,
-            TileMode.repeated, TileMode.repeated, Matrix4.identity().storage);
-    }
-    */
+    var path = Path();
+
+    strokes.all.forEach((Stroke stroke) {
+      if (stroke.screentoneImage != null) {
+        paint = Paint()
+          ..strokeCap = StrokeCap.round
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4.0
+          ..isAntiAlias = false
+          ..shader = ImageShader(stroke.screentoneImage!, TileMode.repeated,
+              TileMode.repeated, Matrix4.identity().storage);
+      }
+
+      stroke._points.asMap().forEach((int index, Offset anOffset) {
+        if (index == 0) {
+          path.moveTo(anOffset.dx, anOffset.dy);
+        } else {
+          path.lineTo(anOffset.dx, anOffset.dy);
+        }
+      });
+    });
 
     canvas.drawPath(path, paint);
   }
@@ -133,7 +138,7 @@ class StrokesModel {
 
   Future<void> screentoneImage() async {
     for (var stroke in _strokes) {
-      // stroke.screentoneImage ??= await getPattern();
+      stroke.screentoneImage ??= await getPattern();
     }
   }
 

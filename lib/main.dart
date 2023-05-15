@@ -118,7 +118,7 @@ class _DrawingPainter extends CustomPainter {
 }
 
 Future<ui.Image> getPattern() async {
-  final ByteData data = await rootBundle.load("img/checker.png");
+  final ByteData data = await rootBundle.load("img/beads4x4.png");
   final Completer<ui.Image> completer = Completer();
   ui.decodeImageFromList(Uint8List.view(data.buffer), (ui.Image img) {
     return completer.complete(img);

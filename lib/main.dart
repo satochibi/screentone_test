@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
-import 'package:screentone_test/fake_device_pixel_ratio_widget.dart';
-
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -187,5 +185,26 @@ class Stroke {
 
   all() {
     return _points;
+  }
+}
+
+class FakeDevicePixelRatio extends StatelessWidget {
+  final num fakeDevicePixelRatio;
+  final Widget child;
+
+  const FakeDevicePixelRatio(
+      {Key? key, required this.fakeDevicePixelRatio, required this.child})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final devicePixelRatio = WidgetsBinding.instance.window.devicePixelRatio;
+
+    final ratio = fakeDevicePixelRatio / devicePixelRatio;
+
+    return FractionallySizedBox(
+        widthFactor: 1 / ratio,
+        heightFactor: 1 / ratio,
+        child: Transform.scale(scale: ratio, child: child));
   }
 }

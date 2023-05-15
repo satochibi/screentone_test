@@ -1,5 +1,10 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+
+import 'package:flutter/services.dart';
 
 void main() => runApp(const MyApp());
 
@@ -113,22 +118,12 @@ class _DrawingPainter extends CustomPainter {
 }
 
 Future<ui.Image> getPattern() async {
-  var pictureRecorder = ui.PictureRecorder();
-  Canvas patternCanvas = Canvas(pictureRecorder);
-
-  final paint = Paint()
-    ..color = Colors.black
-    ..strokeWidth = 1
-    ..style = PaintingStyle.stroke
-    ..strokeJoin = StrokeJoin.round
-    ..isAntiAlias = false;
-
-  patternCanvas.drawPoints(ui.PointMode.points,
-      [const Offset(0, 0), const Offset(1, 1), const Offset(2, 0)], paint);
-
-  final aPatternPicture = pictureRecorder.endRecording();
-
-  return aPatternPicture.toImage(2, 2);
+  final ByteData data = await rootBundle.load("img/checker.png");
+  final Completer<ui.Image> completer = Completer();
+  ui.decodeImageFromList(Uint8List.view(data.buffer), (ui.Image img) {
+    return completer.complete(img);
+  });
+  return completer.future;
 }
 
 class StrokesModel {

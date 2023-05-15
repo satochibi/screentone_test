@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
+import 'package:screentone_test/fake_device_pixel_ratio_widget.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -42,20 +44,23 @@ class DrawingPageState extends State<DrawingPage> {
           return SizedBox(
             width: double.infinity,
             height: double.infinity,
-            child: GestureDetector(
-              onPanDown: (details) {
-                strokes.onPress(details.localPosition);
-                refresh(repaint);
-              },
-              onPanUpdate: (details) {
-                strokes.drawing(details.localPosition);
-                refresh(repaint);
-              },
-              onPanEnd: (details) {
-                refresh(repaint);
-              },
-              child: CustomPaint(
-                painter: _DrawingPainter(strokes),
+            child: FakeDevicePixelRatio(
+              fakeDevicePixelRatio: 1.0,
+              child: GestureDetector(
+                onPanDown: (details) {
+                  strokes.onPress(details.localPosition);
+                  refresh(repaint);
+                },
+                onPanUpdate: (details) {
+                  strokes.drawing(details.localPosition);
+                  refresh(repaint);
+                },
+                onPanEnd: (details) {
+                  refresh(repaint);
+                },
+                child: CustomPaint(
+                  painter: _DrawingPainter(strokes),
+                ),
               ),
             ),
           );

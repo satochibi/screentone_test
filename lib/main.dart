@@ -155,7 +155,8 @@ class StrokesModel {
   get all => _strokes;
 
   Future<void> screentoneImage() async {
-    for (var stroke in _strokes) {
+    var strokesCopy = List<Stroke>.from(_strokes);
+    for (var stroke in strokesCopy) {
       stroke.screentoneImage ??= await getPattern();
     }
   }

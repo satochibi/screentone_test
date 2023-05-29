@@ -7,19 +7,25 @@
         {
             "name": "screentone_test",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": ["--no-enable-impeller"]
+
         },
         {
             "name": "screentone_test (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "args": ["--no-enable-impeller"]
+
         },
         {
             "name": "screentone_test (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "args": ["--no-enable-impeller"]
+
         }
     ]
 }

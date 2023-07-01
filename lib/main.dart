@@ -91,7 +91,7 @@ class _DrawingPainter extends CustomPainter {
         paint = Paint()
           ..strokeCap = StrokeCap.round
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 4.0
+          ..strokeWidth = 50.0
           ..isAntiAlias = false
           ..shader = ImageShader(stroke.screentoneImage!, TileMode.repeated,
               TileMode.repeated, Matrix4.identity().storage);
@@ -126,27 +126,37 @@ Future<ui.Image> getPattern() async {
     ..strokeJoin = StrokeJoin.round
     ..isAntiAlias = false;
 
-  patternCanvas.drawPoints(
-      ui.PointMode.points,
-      [
-        Offset(2, 0),
-        Offset(1, 1),
-        Offset(3, 1),
-        Offset(0, 2),
-        Offset(1, 3),
-        Offset(3, 3),
-        Offset(2 + 4, 0),
-        Offset(1 + 4, 1),
-        Offset(3 + 4, 1),
-        Offset(0 + 4, 2),
-        Offset(1 + 4, 3),
-        Offset(3 + 4, 3)
-      ],
-      paint);
+  final width = 3;
+
+  final aPatternPosition = [
+    Offset(0, 0),
+    Offset(1, 0),
+    Offset(2, 0),
+    Offset(0, 1),
+    Offset(1, 1),
+    Offset(2, 1),
+    Offset(0, 2),
+    Offset(1, 2),
+  ];
+
+  var aPatternXPosition =
+      aPatternPosition.map((e) => e + Offset(width.toDouble(), 0)).toList();
+
+  var aPatternYPosition =
+      aPatternPosition.map((e) => e + Offset(0, width.toDouble())).toList();
+
+  var aPatternXYPosition = aPatternPosition
+      .map((e) => e + Offset(width.toDouble(), width.toDouble()))
+      .toList();
+
+  patternCanvas.drawPoints(ui.PointMode.points, aPatternPosition, paint);
+  patternCanvas.drawPoints(ui.PointMode.points, aPatternXPosition, paint);
+  // patternCanvas.drawPoints(ui.PointMode.points, aPatternYPosition, paint);
+  // patternCanvas.drawPoints(ui.PointMode.points, aPatternXYPosition, paint);
 
   final aPatternPicture = pictureRecorder.endRecording();
 
-  return aPatternPicture.toImage(4, 4);
+  return aPatternPicture.toImage(width, width);
 }
 
 class StrokesModel {
@@ -199,7 +209,7 @@ class FakeDevicePixelRatio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final devicePixelRatio = WidgetsBinding.instance.window.devicePixelRatio;
+    final devicePixelRatio = View.of(context).devicePixelRatio;
 
     final ratio = fakeDevicePixelRatio / devicePixelRatio;
 

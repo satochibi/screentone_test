@@ -42,23 +42,20 @@ class DrawingPageState extends State<DrawingPage> {
           return SizedBox(
             width: double.infinity,
             height: double.infinity,
-            child: FakeDevicePixelRatio(
-              fakeDevicePixelRatio: 1.0,
-              child: GestureDetector(
-                onPanDown: (details) {
-                  strokes.onPress(details.localPosition);
-                  refresh(repaint);
-                },
-                onPanUpdate: (details) {
-                  strokes.drawing(details.localPosition);
-                  refresh(repaint);
-                },
-                onPanEnd: (details) {
-                  refresh(repaint);
-                },
-                child: CustomPaint(
-                  painter: _DrawingPainter(strokes),
-                ),
+            child: GestureDetector(
+              onPanDown: (details) {
+                strokes.onPress(details.localPosition);
+                refresh(repaint);
+              },
+              onPanUpdate: (details) {
+                strokes.drawing(details.localPosition);
+                refresh(repaint);
+              },
+              onPanEnd: (details) {
+                refresh(repaint);
+              },
+              child: CustomPaint(
+                painter: _DrawingPainter(strokes),
               ),
             ),
           );
@@ -194,26 +191,5 @@ class Stroke {
 
   all() {
     return _points;
-  }
-}
-
-class FakeDevicePixelRatio extends StatelessWidget {
-  final num fakeDevicePixelRatio;
-  final Widget child;
-
-  const FakeDevicePixelRatio(
-      {Key? key, required this.fakeDevicePixelRatio, required this.child})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final devicePixelRatio = View.of(context).devicePixelRatio;
-
-    final ratio = fakeDevicePixelRatio / devicePixelRatio;
-
-    return FractionallySizedBox(
-        widthFactor: 1 / ratio,
-        heightFactor: 1 / ratio,
-        child: Transform.scale(scale: ratio, child: child));
   }
 }

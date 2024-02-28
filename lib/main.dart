@@ -126,17 +126,15 @@ Future<ui.Image> getPattern() async {
     ..strokeJoin = StrokeJoin.round
     ..isAntiAlias = false;
 
-  final width = 3;
+  final width = 4;
 
   final aPatternPosition = [
-    Offset(0, 0),
-    Offset(1, 0),
     Offset(2, 0),
-    Offset(0, 1),
     Offset(1, 1),
-    Offset(2, 1),
+    Offset(3, 1),
     Offset(0, 2),
-    Offset(1, 2),
+    Offset(1, 3),
+    Offset(3, 3)
   ];
 
   var aPatternXPosition =

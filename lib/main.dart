@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 
 void main() => runApp(const MyApp());
@@ -36,30 +37,29 @@ class DrawingPageState extends State<DrawingPage> {
       appBar: AppBar(
         title: const Text('Drawing App'),
       ),
-      body: FutureBuilder(
-        future: strokes.screentoneImage(),
-        builder: (context, snapshot) {
-          return SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: GestureDetector(
-              onPanDown: (details) {
-                strokes.onPress(details.localPosition);
-                refresh(repaint);
-              },
-              onPanUpdate: (details) {
-                strokes.drawing(details.localPosition);
-                refresh(repaint);
-              },
-              onPanEnd: (details) {
-                refresh(repaint);
-              },
-              child: CustomPaint(
-                painter: _DrawingPainter(strokes),
-              ),
-            ),
-          );
-        },
+      body: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: GestureDetector(
+          onPanDown: (details) {
+            strokes.onPress(details.localPosition);
+            refresh(repaint);
+          },
+          onPanUpdate: (details) {
+            strokes.drawing(details.localPosition);
+            refresh(repaint);
+          },
+          onPanEnd: (details) {
+            refresh(repaint);
+          },
+          child: FutureBuilder(
+              future: strokes.screentoneImage(),
+              builder: (context, snapshot) {
+                return CustomPaint(
+                  painter: _DrawingPainter(strokes),
+                );
+              }),
+        ),
       ),
     );
   }
@@ -88,7 +88,7 @@ class _DrawingPainter extends CustomPainter {
         paint = Paint()
           ..strokeCap = StrokeCap.round
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 50.0
+          ..strokeWidth = 3.0
           ..isAntiAlias = false
           ..shader = ImageShader(stroke.screentoneImage!, TileMode.repeated,
               TileMode.repeated, Matrix4.identity().storage);
@@ -113,45 +113,9 @@ class _DrawingPainter extends CustomPainter {
 }
 
 Future<ui.Image> getPattern() async {
-  var pictureRecorder = ui.PictureRecorder();
-  Canvas patternCanvas = Canvas(pictureRecorder);
-
-  final paint = Paint()
-    ..color = Colors.black
-    ..strokeWidth = 1
-    ..style = PaintingStyle.stroke
-    ..strokeJoin = StrokeJoin.round
-    ..isAntiAlias = false;
-
-  final width = 4;
-
-  final aPatternPosition = [
-    Offset(2, 0),
-    Offset(1, 1),
-    Offset(3, 1),
-    Offset(0, 2),
-    Offset(1, 3),
-    Offset(3, 3)
-  ];
-
-  var aPatternXPosition =
-      aPatternPosition.map((e) => e + Offset(width.toDouble(), 0)).toList();
-
-  var aPatternYPosition =
-      aPatternPosition.map((e) => e + Offset(0, width.toDouble())).toList();
-
-  var aPatternXYPosition = aPatternPosition
-      .map((e) => e + Offset(width.toDouble(), width.toDouble()))
-      .toList();
-
-  patternCanvas.drawPoints(ui.PointMode.points, aPatternPosition, paint);
-  patternCanvas.drawPoints(ui.PointMode.points, aPatternXPosition, paint);
-  // patternCanvas.drawPoints(ui.PointMode.points, aPatternYPosition, paint);
-  // patternCanvas.drawPoints(ui.PointMode.points, aPatternXYPosition, paint);
-
-  final aPatternPicture = pictureRecorder.endRecording();
-
-  return aPatternPicture.toImage(width, width);
+  final data = await rootBundle.load('img/beads4x4.png');
+  final bytes = data.buffer.asUint8List();
+  return decodeImageFromList(bytes);
 }
 
 class StrokesModel {

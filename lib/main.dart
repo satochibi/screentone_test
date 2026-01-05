@@ -95,8 +95,9 @@ class ArtBoardState extends State<ArtBoard> {
         child: FutureBuilder(
           future: strokes.screentoneImage(),
           builder: (context, snapshot) {
+            final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
             return CustomPaint(
-              painter: _DrawingPainter(strokes),
+              painter: _DrawingPainter(strokes, devicePixelRatio),
             );
           },
         ),
@@ -107,21 +108,26 @@ class ArtBoardState extends State<ArtBoard> {
 
 class _DrawingPainter extends CustomPainter {
   final StrokesModel strokes;
+  final double devicePixelRatio;
 
-  _DrawingPainter(this.strokes);
+  _DrawingPainter(this.strokes, this.devicePixelRatio);
 
   @override
   void paint(Canvas canvas, Size size) {
     if (strokes.all.isEmpty) return;
 
+    final dpr = devicePixelRatio;
+
     Paint paint = Paint()
       ..color = Colors.black
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
-      ..isAntiAlias = false
       ..strokeWidth = 4.0;
 
     var path = Path();
+
+    final matrix = Matrix4.identity()
+      ..scaleByDouble(1 / dpr, 1 / dpr, 1 / dpr, 1 / dpr);
 
     strokes.all.forEach((Stroke stroke) {
       if (stroke.screentoneImage != null) {
@@ -129,9 +135,12 @@ class _DrawingPainter extends CustomPainter {
           ..strokeCap = StrokeCap.round
           ..style = PaintingStyle.stroke
           ..strokeWidth = 3.0
-          ..isAntiAlias = false
-          ..shader = ImageShader(stroke.screentoneImage!, TileMode.repeated,
-              TileMode.repeated, Matrix4.identity().storage);
+          ..shader = ImageShader(
+            stroke.screentoneImage!,
+            TileMode.repeated,
+            TileMode.repeated,
+            matrix.storage,
+          );
       }
 
       stroke._points.asMap().forEach((int index, Offset anOffset) {

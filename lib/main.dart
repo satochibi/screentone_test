@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 
@@ -45,9 +46,11 @@ class WatchLocalPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.blue, width: 4.0),
                   ),
-                  child: const AspectRatio(
-                    aspectRatio: 4 / 3,
-                    child: ArtBoard(),
+                  child: PixelSnap(
+                    child: AspectRatio(
+                      aspectRatio: 4 / 3,
+                      child: ArtBoard(),
+                    ),
                   ),
                 ),
               ),
@@ -204,5 +207,44 @@ class Stroke {
 
   all() {
     return _points;
+  }
+}
+
+class PixelSnap extends SingleChildRenderObjectWidget {
+  const PixelSnap({super.key, super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return _RenderPixelSnap();
+  }
+}
+
+class _RenderPixelSnap extends RenderProxyBox {
+  @override
+  void performLayout() {
+    if (child != null) {
+      child!.layout(constraints, parentUsesSize: true);
+
+      final snappedSize = Size(
+        child!.size.width.floorToDouble(),
+        child!.size.height.floorToDouble(),
+      );
+
+      size = constraints.constrain(snappedSize);
+    } else {
+      size = constraints.smallest;
+    }
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final snappedOffset = Offset(
+      offset.dx.floorToDouble(),
+      offset.dy.floorToDouble(),
+    );
+
+    if (child != null) {
+      context.paintChild(child!, snappedOffset);
+    }
   }
 }

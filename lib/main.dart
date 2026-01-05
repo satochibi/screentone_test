@@ -15,16 +15,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// 見る(ローカル)画面
 class WatchLocalPage extends StatelessWidget {
-  /// コンストラクタ
   const WatchLocalPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('見る'),
+        title: const Text('Watch'),
         bottomOpacity: 0,
         elevation: 0,
         scrolledUnderElevation: 0,

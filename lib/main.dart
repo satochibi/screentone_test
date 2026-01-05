@@ -10,19 +10,65 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: DrawingPage(),
+      home: WatchLocalPage(),
     );
   }
 }
 
-class DrawingPage extends StatefulWidget {
-  const DrawingPage({super.key});
+/// 見る(ローカル)画面
+class WatchLocalPage extends StatelessWidget {
+  /// コンストラクタ
+  const WatchLocalPage({super.key});
 
   @override
-  DrawingPageState createState() => DrawingPageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('見る'),
+        bottomOpacity: 0,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
+      body: SafeArea(
+        child: GridView.builder(
+          padding: const EdgeInsets.all(12),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 320,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemCount: 2,
+          itemBuilder: (context, index) {
+            return Center(
+              child: SizedBox(
+                width: double.infinity,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blue, width: 4.0),
+                  ),
+                  child: const AspectRatio(
+                    aspectRatio: 4 / 3,
+                    child: ArtBoard(),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 }
 
-class DrawingPageState extends State<DrawingPage> {
+class ArtBoard extends StatefulWidget {
+  const ArtBoard({super.key});
+
+  @override
+  ArtBoardState createState() => ArtBoardState();
+}
+
+class ArtBoardState extends State<ArtBoard> {
   StrokesModel strokes = StrokesModel();
   final repaint = ValueNotifier<int>(0);
 
@@ -33,32 +79,28 @@ class DrawingPageState extends State<DrawingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Drawing App'),
-      ),
-      body: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: GestureDetector(
-          onPanDown: (details) {
-            strokes.onPress(details.localPosition);
-            refresh(repaint);
+    return SizedBox(
+      width: double.infinity,
+      height: double.infinity,
+      child: GestureDetector(
+        onPanDown: (details) {
+          strokes.onPress(details.localPosition);
+          refresh(repaint);
+        },
+        onPanUpdate: (details) {
+          strokes.drawing(details.localPosition);
+          refresh(repaint);
+        },
+        onPanEnd: (details) {
+          refresh(repaint);
+        },
+        child: FutureBuilder(
+          future: strokes.screentoneImage(),
+          builder: (context, snapshot) {
+            return CustomPaint(
+              painter: _DrawingPainter(strokes),
+            );
           },
-          onPanUpdate: (details) {
-            strokes.drawing(details.localPosition);
-            refresh(repaint);
-          },
-          onPanEnd: (details) {
-            refresh(repaint);
-          },
-          child: FutureBuilder(
-              future: strokes.screentoneImage(),
-              builder: (context, snapshot) {
-                return CustomPaint(
-                  painter: _DrawingPainter(strokes),
-                );
-              }),
         ),
       ),
     );
@@ -113,7 +155,7 @@ class _DrawingPainter extends CustomPainter {
 }
 
 Future<ui.Image> getPattern() async {
-  final data = await rootBundle.load('img/beads4x4.png');
+  final data = await rootBundle.load('img/rough2x2.png');
   final bytes = data.buffer.asUint8List();
   return decodeImageFromList(bytes);
 }

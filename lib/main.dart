@@ -37,7 +37,7 @@ class WatchLocalPage extends StatelessWidget {
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
           ),
-          itemCount: 2,
+          itemCount: 3,
           itemBuilder: (context, index) {
             return Center(
               child: SizedBox(
@@ -46,11 +46,9 @@ class WatchLocalPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.blue, width: 4.0),
                   ),
-                  child: PixelSnap(
-                    child: AspectRatio(
-                      aspectRatio: 4 / 3,
-                      child: ArtBoard(),
-                    ),
+                  child: AspectRatio(
+                    aspectRatio: 4 / 3,
+                    child: ArtBoard(),
                   ),
                 ),
               ),
@@ -129,8 +127,7 @@ class _DrawingPainter extends CustomPainter {
 
     var path = Path();
 
-    final matrix = Matrix4.identity()
-      ..scaleByDouble(1 / dpr, 1 / dpr, 1 / dpr, 1 / dpr);
+    final matrix = Matrix4.identity();
 
     strokes.all.forEach((Stroke stroke) {
       if (stroke.screentoneImage != null) {
@@ -210,6 +207,8 @@ class Stroke {
   }
 }
 
+/// 子ウィジェットのレイアウト結果をいったん受け取り、
+/// サイズと描画位置を必ず整数論理ピクセルに丸めてから描画する
 class PixelSnap extends SingleChildRenderObjectWidget {
   const PixelSnap({super.key, super.child});
 
@@ -220,6 +219,7 @@ class PixelSnap extends SingleChildRenderObjectWidget {
 }
 
 class _RenderPixelSnap extends RenderProxyBox {
+  /// サイズを整数化
   @override
   void performLayout() {
     if (child != null) {
@@ -236,6 +236,7 @@ class _RenderPixelSnap extends RenderProxyBox {
     }
   }
 
+  /// 位置を整数化
   @override
   void paint(PaintingContext context, Offset offset) {
     final snappedOffset = Offset(

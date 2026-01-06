@@ -3,6 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 
+import 'package:screentone_test/sub.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -10,14 +12,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       home: WatchLocalPage(),
     );
   }
 }
 
 class WatchLocalPage extends StatelessWidget {
-  const WatchLocalPage({super.key});
+  WatchLocalPage({super.key});
+
+  final aspectRatios = [
+    4 / 3,
+    16 / 9,
+    1 / 1,
+    16 / 9,
+    4 / 3,
+    1 / 1,
+    4 / 3,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -31,25 +43,23 @@ class WatchLocalPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: GridView.builder(
-          padding: const EdgeInsets.all(12),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          padding: EdgeInsets.all(12),
+          gridDelegate:
+              SliverGridDelegateWithSnappedMaxCrossAxisExtentVariableAspect(
             maxCrossAxisExtent: 320,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
+            childAspectRatios: aspectRatios,
           ),
-          itemCount: 3,
+          itemCount: aspectRatios.length,
           itemBuilder: (context, index) {
-            return Center(
-              child: SizedBox(
-                width: double.infinity,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 4.0),
-                  ),
-                  child: AspectRatio(
-                    aspectRatio: 4 / 3,
-                    child: ArtBoard(),
-                  ),
+            return PixelSnap(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue, width: 4.0),
+                ),
+                child: Center(
+                  child: ArtBoard(),
                 ),
               ),
             );
@@ -126,6 +136,8 @@ class _DrawingPainter extends CustomPainter {
       ..strokeWidth = 4.0;
 
     var path = Path();
+
+    print(size);
 
     final matrix = Matrix4.identity();
 
